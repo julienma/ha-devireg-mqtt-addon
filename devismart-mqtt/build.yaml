@@ -1,14 +1,5 @@
-# https://developers.home-assistant.io/docs/add-ons/configuration#add-on-dockerfile
+# Local add-on: built on the Home Assistant host (no prebuilt image).
+# Debian base needed for apt-get + openjdk-21 (the Supervisor default base is Alpine).
 build_from:
   aarch64: "ghcr.io/home-assistant/aarch64-base-debian:latest"
   amd64: "ghcr.io/home-assistant/amd64-base-debian:latest"
-  armhf: "ghcr.io/home-assistant/armhf-base-debian:latest"
-  armv7: "ghcr.io/home-assistant/armv7-base-debian:latest"
-  i386: "ghcr.io/home-assistant/i386-base-debian:latest"
-labels:
-  org.opencontainers.image.title: "Devireg MQTT add-on"
-  org.opencontainers.image.description: "Devireg MQTT add-on"
-  org.opencontainers.image.source: "https://github.com/julienma/ha-devireg-mqtt-addon/"
-  org.opencontainers.image.licenses: "Apache License 2.0"
-args:
-  TEMPIO_VERSION: "2021.09.0"

@@ -1,35 +1,66 @@
-# Devireg Mqtt Add-on:
-Based on <https://github.com/igor-podpalchenko/ha-devi-mqtt> and my fork <https://github.com/julienma/ha-devi-mqtt>
+# Devismart MQTT (patched)
 
-## How to Use 
-Configure MQTT settings in addon settings. Version 0.3+ uses GUI, not mqtt_config.json.
-if you have mqtt_config.json from early versions - you can delete it and copy settings to GUI. Or just leave it and Ignore GUI.
+Basé sur [bob-tm/ha-apps](https://github.com/bob-tm/ha-apps) 0.5 et
+[igor-podpalchenko/ha-devi-mqtt](https://github.com/igor-podpalchenko/ha-devi-mqtt), avec la liste
+complète des serveurs du cloud Danfoss et une reconnexion fiabilisée (voir le CHANGELOG).
 
-Addon needs devi_config.json to connect to Devi cloud. 
-Version 0.3+ can generate it inside this addon (not tested)
+Les noms ci-dessous (`72ae8254_…`) supposent que le dépôt a été ajouté avec l'URL exacte
+`https://github.com/julienma/ha-devireg-mqtt-addon`. En cas de doute, le vrai nom du conteneur
+est donné par `docker ps --format '{{.Names}}' | grep devismart`.
 
-## How to generate devi_config.json in 0.3 Beta +
-# Method1: Inside addon (preferred)
+## 1. Configuration
 
-0. Set mqtt server params. For HA mosquitto addon set host to "core-mosquitto" or local HA address ("192.168.x.x") and add user and password.
-1. Start Devismart MQTT addon. Check logs for message (devi_config.json not found. Running in waiting mode)
-2. Install and Run Advanced SSH & Web Terminal https://github.com/hassio-addons/addon-ssh
-3. Disable Protection mode Advanced SSH & Web Terminal (remember to reboot)
-4. Click Open Web UI for Advanced SSH & Web Terminal
-5. Enter in terminal `docker container ls -a | awk 'NR>1 {print $1, $2}' | grep 'devismart-mqtt'`
-6. Look for CONTAINER ID for devismart-mqtt. Looks like 4b9fa34ad83e
-7. Replace 4b9fa34ad83e with your id and Run  `docker exec -it 4b9fa34ad83e /config.sh`
-8. Foloow instructions on screen. devi_config.json  should be saved to addon config folder. In this step there was instructions inside SSH. The code from mobile app is inputted without “-” -marks, so only numbers. I chose to give permission to delete thermostats when asked before creating the code. Took couple of tries but then it worked. And wait, at least for me this step took quite long. Finally there is a message that the config is added or something similar.
-9. Restart Devismart MQTT addon.
-10. Check addon logs for message (Config Exists!) or list of autodiscovered items.
-11. Go to MQTT Integration and check for Devi devices!
+Onglet **Configuration** : hôte `core-mosquitto` (broker Mosquitto de HA), port `1883`,
+utilisateur et mot de passe MQTT.
 
-# Method2: needs Java to be installed on PC
-0. Start Devismart MQTT addon. Check logs for message (devi_config.json not found. Running in waiting mode)
-1. Open http://homeassistant:8000 and download ha-devi-mqtt.jar to your pc
-2. Install Java 
-3. Run java -cp ha-devi-mqtt.jar io.homeassistant.devi.mqtt.service.DiscoveryService
-4. Upload devi_config.json to addon config folder "\\192.168.x.x\addon_configs\xxxxxxxx_devismart-mqtt\"
-4. SRestart Devismart MQTT addon.
-5. Check addon logs for message (Config Exists!) or list of autodiscovered items.
-6. Go to MQTT Integration and check for Devi devices!
+Au premier démarrage, le journal affiche `devi_config.json not found` / `Running in waiting mode` :
+l'add-on attend d'être appairé.
+
+Si l'add-on Devismart MQTT d'origine est installé, l'arrêter : les deux utilisent le port 8000.
+
+## 2. Prérequis à l'appairage : tous les thermostats joignables
+
+L'app ECtemp Smart **refuse de générer un code OTP tant qu'un seul thermostat de la maison est
+injoignable**. Ouvrir l'app et attendre que tous les thermostats y soient affichés ; enchaîner
+l'appairage tant que c'est le cas.
+
+Avant d'appairer, supprimer dans l'app les accès partagés obsolètes : chaque thermostat n'a que
+10 emplacements d'appairage.
+
+## 3. Appairer
+
+1. Installer l'add-on **Advanced SSH & Web Terminal**, désactiver son *Protection mode*,
+   l'ouvrir.
+2. Lancer l'appairage :
+   ```bash
+   docker exec -it addon_72ae8254_devismart-mqtt /config.sh
+   ```
+3. Dans l'app : Réglages → Partager la maison, et saisir le code **sans les tirets**. Le premier
+   code échoue souvent : en régénérer un et recommencer. L'étape peut être longue.
+
+## 4. Sauvegarder l'identité — immédiatement
+
+```bash
+cat /addon_configs/72ae8254_devismart-mqtt/devi_config.json
+```
+
+Copier la sortie dans un gestionnaire de mots de passe. Elle contient la clé privée du pont : la
+perdre oblige à ré-appairer, donc à réunir à nouveau tous les thermostats.
+
+## 5. Vérifier
+
+Redémarrer l'add-on. Dans le journal :
+
+- `Config Exists!` puis `Successfully connected to Danfoss grid` ;
+- `Connection established` pour chaque thermostat ;
+- en cas d'échec : `Reconnecting to peer … in N s`, N augmentant de 10 à 300 s.
+
+Les thermostats apparaissent dans l'intégration MQTT. Un thermostat peut mettre quelques minutes
+à se connecter : certains ne restent joignables sur le cloud que par intermittence, l'add-on
+réessaie jusqu'à tomber dans une fenêtre, puis la connexion tient.
+
+## Personnalisation des entités
+
+Les modèles d'auto-discovery peuvent être surchargés : copier le dossier
+`auto-discovery-templates` dans `/addon_configs/72ae8254_devismart-mqtt/` et modifier les JSON.
+Ils sont prioritaires sur ceux intégrés à l'add-on.

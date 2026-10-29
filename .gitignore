@@ -1,0 +1,8 @@
+# Never publish the bridge identity (SDG private key) if it ever lands here
+devi_config.json
+mqtt_config.json
+
+# Build output and local tooling
+target/
+.claude/
+.DS_Store

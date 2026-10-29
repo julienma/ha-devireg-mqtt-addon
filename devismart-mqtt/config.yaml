@@ -1,12 +1,10 @@
 # https://developers.home-assistant.io/docs/add-ons/configuration#add-on-config
-name: Devismart MQTT
-version: "0.3.beta2"
+name: Devismart MQTT (patched)
+version: "0.5.1-patched"
 slug: devismart-mqtt
-description: Devismart MQTT Addon
-url: "https://github.com/julienma/ha-devireg-mqtt-addon/"
+description: Devismart MQTT Addon - full Danfoss grid server list, resilient reconnection
+url: "https://github.com/julienma/ha-devireg-mqtt-addon"
 arch:
-  - armhf
-  - armv7
   - aarch64
   - amd64
 init: false
