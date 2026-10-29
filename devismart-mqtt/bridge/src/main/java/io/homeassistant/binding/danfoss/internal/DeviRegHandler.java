@@ -68,6 +68,10 @@ public class DeviRegHandler extends BaseThingHandler implements ISDGPeerHandler 
         super(thing);
     }
 
+    public boolean isConnected() {
+        return connHandler.isConnected();
+    }
+
     public void handleCommand(String sensorId, String payload) {
 
         ChannelUID ch = new ChannelUID(new ThingUID("cmd", "danfoss", "devismart"), sensorId);

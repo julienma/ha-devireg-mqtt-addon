@@ -204,6 +204,11 @@ public class SDGPeerConnector {
         reconnectDelayMs = Math.min(reconnectDelayMs * 2, RECONNECT_DELAY_MAX_MS);
     }
 
+    public boolean isConnected() {
+        DeviSmartConnection conn = connection;
+        return conn != null && conn.getState() == Connection.State.CONNECTED;
+    }
+
     public void Send(byte[] data) {
         // Cache "connection" in order to avoid possible race condition
         // with dispose() zeroing it between test and usage

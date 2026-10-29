@@ -1,4 +1,8 @@
 <!-- https://developers.home-assistant.io/docs/add-ons/presentation#keeping-a-changelog -->
+## 0.5.2-patched
+- MQTT commands received while a thermostat is not connected are now logged as a warning
+  ("Command … dropped: thermostat … is not connected") instead of being silently discarded
+
 ## 0.5.1-patched
 - Full Danfoss SecureDeviceGrid server list (8 servers instead of 4): thermostats registered on the
   servers missing from opensdg_java 1.0.0 were unreachable ("Connection refused by grid: 1")
