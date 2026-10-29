@@ -31,8 +31,9 @@ https://github.com/julienma/ha-devireg-mqtt-addon
 ```
 
 Sans `/` final ni `.git` : HA dérive le nom interne de l'add-on de cette URL. Avec celle-ci,
-le conteneur s'appelle `addon_72ae8254_devismart-mqtt` et sa configuration est dans
-`/addon_configs/72ae8254_devismart-mqtt/` (les noms utilisés dans la documentation).
+le conteneur s'appelle `app_72ae8254_devismart-mqtt` et sa configuration est dans
+`/mnt/data/supervisor/app_configs/72ae8254_devismart-mqtt/` sur l'hôte (les noms utilisés dans la
+documentation ; les versions de HA antérieures aux « apps » utilisaient le préfixe `addon_`).
 
 Installer ensuite **Devismart MQTT (patched)**. L'add-on est compilé sur la machine HA :
 compter 10 à 20 minutes. Architectures : `aarch64`, `amd64`.

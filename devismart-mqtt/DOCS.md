@@ -33,7 +33,7 @@ Avant d'appairer, supprimer dans l'app les accès partagés obsolètes : chaque 
    l'ouvrir.
 2. Lancer l'appairage :
    ```bash
-   docker exec -it addon_72ae8254_devismart-mqtt /config.sh
+   docker exec -it app_72ae8254_devismart-mqtt /config.sh
    ```
 3. Dans l'app : Réglages → Partager la maison, et saisir le code **sans les tirets**. Le premier
    code échoue souvent : en régénérer un et recommencer. L'étape peut être longue.
@@ -41,8 +41,12 @@ Avant d'appairer, supprimer dans l'app les accès partagés obsolètes : chaque 
 ## 4. Sauvegarder l'identité — immédiatement
 
 ```bash
-cat /addon_configs/72ae8254_devismart-mqtt/devi_config.json
+docker exec app_72ae8254_devismart-mqtt cat /config/devi_config.json
 ```
+
+(Le dossier de configuration de l'add-on, `/config` dans le conteneur, est
+`/mnt/data/supervisor/app_configs/72ae8254_devismart-mqtt/` sur l'hôte ; le terminal SSH ne le
+monte pas, d'où le `docker exec`.)
 
 Copier la sortie dans un gestionnaire de mots de passe. Elle contient la clé privée du pont : la
 perdre oblige à ré-appairer, donc à réunir à nouveau tous les thermostats.
@@ -62,5 +66,9 @@ réessaie jusqu'à tomber dans une fenêtre, puis la connexion tient.
 ## Personnalisation des entités
 
 Les modèles d'auto-discovery peuvent être surchargés : copier le dossier
-`auto-discovery-templates` dans `/addon_configs/72ae8254_devismart-mqtt/` et modifier les JSON.
+`auto-discovery-templates` dans le dossier de configuration de l'add-on (`/config` dans le
+conteneur) et modifier les JSON :
+```bash
+docker exec app_72ae8254_devismart-mqtt cp -r /app/auto-discovery-templates /config/
+```
 Ils sont prioritaires sur ceux intégrés à l'add-on.
